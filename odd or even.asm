@@ -1,58 +1,57 @@
 .model small
 .stack 100h
 .data
-    msg db 'Enter a number : $'
+    msg db 'Enter a number (0-9): $'
     rslt db 'The result is : $'
+    evenMsg db 'Even$'
+    oddMsg db 'Odd$'
 .code
-main proc     
-    mov ax,@data
-    mov ds,ax
+main proc
+    mov ax, @data
+    mov ds, ax
 
-    mov ah,9
-    lea dx,msg
+    mov ah, 9
+    lea dx, msg
     int 21h
 
-    mov ah,1
-    sub al,30h
+    mov ah, 1
     int 21h
+    sub al, 30h ; Convert ASCII to integer
 
-    cmp al,1
-    je odd
-    cmp al,3
-    je odd
+    mov ah, 0
+    mov bl, al
+    and bl, 1 
+    cmp bl, 0 
+    je isEven
 
-    cmp al,2
-    je even
-    cmp al,4
-    je even
+    isOdd:
+        mov ah,02
+        mov dl,10
+        int 21h
+        mov dl,13
+        int 21h
+ 
+        mov ah, 9
+        lea dx, rslt
+        int 21h
+        lea dx, oddMsg
+        int 21h
+        jmp exit
 
-    odd:
-    mov bl,'o'
-    jmp print
-    jmp exit
+    isEven:    
+        mov ah,02
+        mov dl,10
+        int 21h
+        mov dl,13
+        int 21h
+    
+        mov ah, 9
+        lea dx, rslt
+        int 21h
+        lea dx, evenMsg
+        int 21h
 
-    even:
-    mov bl,'e'
-    jmp print
-    jmp exit
-
-    print:
-    mov ah,02
-    mov dl,10
-    int 21h
-    mov dl,13
-    int 21h
-
-    mov ah,9
-    lea dx,rslt
-    int 21h
-
-    mov ah,02
-    mov dl,bl
-    int 21h
-    jmp exit
-
-    exit: 
-    mov ax,04c1h
-    int 21h
+    exit:
+        mov ax, 4C00h
+        int 21h
 end main
